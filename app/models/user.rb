@@ -5,4 +5,8 @@ class User < ApplicationRecord
           :confirmable, :omniauthable
   include DeviseTokenAuth::Concerns::User
   has_many :ratings
+
+  def author_of?(object)
+    id == object.user_id
+  end
 end

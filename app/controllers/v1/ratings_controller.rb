@@ -8,12 +8,14 @@ class V1::RatingsController < ApplicationController
   end
 
   def show
+    authorize @rating
     render json: @rating
   end
 
   def create
     @rating = Rating.new(rating_params)
     @rating.user = current_user
+    authorize @rating
     if @rating.save
       render json: @rating
     else
@@ -22,6 +24,7 @@ class V1::RatingsController < ApplicationController
   end
 
   def update
+    authorize @rating
     if @rating.update_attributes(rating_params)
       render json: @rating
     else
