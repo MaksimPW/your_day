@@ -3,7 +3,12 @@ class V1::RatingsController < ApplicationController
   before_action :set_rating, only: [:show, :update]
 
   def index
-    @ratings = Rating.where(user: current_user)
+    @ratings =
+        if params[:start_date].present? && params[:end_date].present?
+          Rating.where(user: current_user, day: params[:start_date]..params[:end_date])
+        else
+          Rating.where(user: current_user).recent
+        end
     render json: @ratings
   end
 

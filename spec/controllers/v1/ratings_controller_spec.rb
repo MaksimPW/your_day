@@ -4,21 +4,42 @@ RSpec.describe V1::RatingsController, type: :controller do
   let!(:user) { create(:user) }
 
   describe 'GET #index' do
-    let!(:ratings) { create_list(:rating, 2, user: user) }
-
     context 'as Auth' do
-      before do
-        sign_in_api user
-        get :index, format: :json
+      before { sign_in_api user }
+
+      context 'with start_date and end_date' do
+        let!(:ratings) { create_list(:rating, 5, user: user, day: Faker::Date.between('2017-02-01', '2017-02-05')) }
+
+        it 'response ok' do
+          get :index, params: { start_date: '2017-02-01', end_date: '2017-02-05' }, format: :json
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'have array json size' do
+          get :index, params: { start_date: '2017-02-01', end_date: '2017-02-05' }, format: :json
+          expect(JSON.parse(response.body).size).to eq ratings.size
+        end
       end
 
-      it 'response ok' do
-        expect(response).to have_http_status(:ok)
-      end
+      context 'recent' do
+        let!(:ratings) { create_list(:rating, 25, user: user, day: Faker::Date.between(30.days.ago, Date.today)) }
+        let!(:other_ratings) { create_list(:rating, 2, user: user, day: Faker::Date.between(60.days.ago, 58.days.ago)) }
 
-      %w(id day value).each do |attr|
-        it "have json attr #{attr}" do
-          expect(response.body).to be_json_eql(ratings.first.send(attr.to_sym).to_json).at_path("0/#{attr}")
+        it 'response ok' do
+          get :index, format: :json
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'have array json size' do
+          get :index, format: :json
+          expect(JSON.parse(response.body).size).to eq ratings.size
+        end
+
+        %w(id day value).each do |attr|
+          it "have json attr #{attr}" do
+            get :index, format: :json
+            expect(response.body).to be_json_eql(ratings.first.send(attr.to_sym).to_json).at_path("0/#{attr}")
+          end
         end
       end
     end

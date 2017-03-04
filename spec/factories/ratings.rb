@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :rating do
-    value 7
-    day "2017-02-26"
+    sequence(:value) { rand(0..10) }
+    sequence(:day) { |n| (Date.new(2000,01,30) + n.days).to_s }
     user
   end
 end
