@@ -35,18 +35,33 @@ RSpec.describe V1::RatingsController, type: :controller do
     let!(:rating) { create(:rating, user: user) }
 
     context 'as Auth' do
-      before do
-        sign_in_api user
-        get :show, params: { id: rating }, format: :json
+      before { sign_in_api user }
+
+      context 'by id' do
+        before { get :show, params: { id: rating }, format: :json }
+
+        it 'response ok' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        %w(id day value).each do |attr|
+          it "have json attr #{attr}" do
+            expect(response.body).to be_json_eql(rating.send(attr.to_sym).to_json).at_path(attr)
+          end
+        end
       end
 
-      it 'response ok' do
-        expect(response).to have_http_status(:ok)
-      end
+      context 'by date' do
+        before { get :show, params: { id: rating.day }, format: :json }
 
-      %w(id day value).each do |attr|
-        it "have json attr #{attr}" do
-          expect(response.body).to be_json_eql(rating.send(attr.to_sym).to_json).at_path(attr)
+        it 'response ok' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        %w(id day value).each do |attr|
+          it "have json attr #{attr}" do
+            expect(response.body).to be_json_eql(rating.send(attr.to_sym).to_json).at_path(attr)
+          end
         end
       end
     end
@@ -101,9 +116,18 @@ RSpec.describe V1::RatingsController, type: :controller do
       before { sign_in_api user }
 
       context 'with valid' do
-        it 'response ok' do
-          patch :update, params: { id: rating, rating: { value: 10 } }, format: :json
-          expect(response).to have_http_status(:ok)
+        context 'by id' do
+          it 'response ok' do
+            patch :update, params: { id: rating, rating: { value: 10 } }, format: :json
+            expect(response).to have_http_status(:ok)
+          end
+        end
+
+        context 'by date' do
+          it 'response ok' do
+            patch :update, params: { id: rating.day, rating: { value: 10 } }, format: :json
+            expect(response).to have_http_status(:ok)
+          end
         end
       end
 

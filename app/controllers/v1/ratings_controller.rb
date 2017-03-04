@@ -34,7 +34,11 @@ class V1::RatingsController < ApplicationController
 
   private
   def set_rating
-    @rating = Rating.find(params[:id])
+    if params[:id].include?('-') #hardcode
+      @rating = Rating.find_by(day: params[:id].to_date, user: current_user)
+    else
+      @rating = Rating.find(params[:id])
+    end
   end
 
   def rating_params
