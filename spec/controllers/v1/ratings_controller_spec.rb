@@ -8,7 +8,7 @@ RSpec.describe V1::RatingsController, type: :controller do
       before { sign_in_api user }
 
       context 'with start_date and end_date' do
-        let!(:ratings) { create_list(:rating, 5, user: user, day: Faker::Date.between('2017-02-01', '2017-02-05')) }
+        let(:ratings) { create_list(:rating, 5, :date_offset, day_offset: '2017-02-01', user: user) }
 
         it 'response ok' do
           get :index, params: { start_date: '2017-02-01', end_date: '2017-02-05' }, format: :json
@@ -16,14 +16,14 @@ RSpec.describe V1::RatingsController, type: :controller do
         end
 
         it 'have array json size' do
+          ratings
           get :index, params: { start_date: '2017-02-01', end_date: '2017-02-05' }, format: :json
           expect(JSON.parse(response.body).size).to eq ratings.size
         end
       end
 
       context 'recent' do
-        let!(:ratings) { create_list(:rating, 25, user: user, day: Faker::Date.between(30.days.ago, Date.today)) }
-        let!(:other_ratings) { create_list(:rating, 2, user: user, day: Faker::Date.between(60.days.ago, 58.days.ago)) }
+        let!(:ratings) { create_list(:rating, 25, :date_offset, day_offset: 30.days.ago, user: user) }
 
         it 'response ok' do
           get :index, format: :json
