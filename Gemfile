@@ -33,6 +33,9 @@ gem 'devise_token_auth'
 gem 'active_model_serializers'
 gem 'pundit'
 gem 'faker'
+gem 'figaro'
+gem 'omniauth'
+gem 'omniauth-github'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

@@ -1,0 +1,9 @@
+test:
+  github_key: ~
+  github_secret: ~
+development:
+  github_key: ~
+  github_secret: ~
+production:
+  github_key: ~
+  github_secret: ~
